@@ -11,7 +11,9 @@ import { format } from 'date-fns'
 import { cn } from "@/lib/utils"
 
 // Placeholder data for routes
-const routes = [
+type TransportMode = 'bus' | 'train' | 'flight' | 'car';
+
+const routes: { id: number, mode: TransportMode, time: number, distance: string, price: number, eco: boolean }[] = [
   { id: 1, mode: 'bus', time: 150, distance: '150 km', price: 25, eco: true },
   { id: 2, mode: 'train', time: 105, distance: '180 km', price: 40, eco: true },
   { id: 3, mode: 'flight', time: 60, distance: '300 km', price: 120, eco: false },
@@ -25,59 +27,53 @@ const tips = [
   "Pack light to avoid excess baggage fees on flights.",
 ]
 
-type DatePickerProps = {
-  date: Date | undefined,
-  setDate: (date: Date) => void
-}
+// Date Picker Component
+const DatePicker = ({ date, setDate }: { date: Date | undefined, setDate: (date: Date | undefined) => void }) => (
+  <Popover>
+    <PopoverTrigger asChild>
+      <Button
+        variant={"outline"}
+        className={cn(
+          "w-full justify-start text-left font-normal",
+          !date && "text-muted-foreground"
+        )}
+      >
+        <CalendarIcon className="mr-2 h-4 w-4" />
+        {date ? format(date, "PPP") : <span>Pick a date</span>}
+      </Button>
+    </PopoverTrigger>
+    <PopoverContent className="w-auto p-0" align="start">
+      <Calendar
+        mode="single"
+        selected={date}
+        onSelect={setDate}
+        initialFocus
+        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+      />
+    </PopoverContent>
+  </Popover>
+)
 
-const DatePicker = ({ date, setDate }: DatePickerProps) => {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant={"outline"}
-          className={cn(
-            "w-full justify-start text-left font-normal",
-            !date && "text-muted-foreground"
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={(date) => date && setDate(date)}
-          initialFocus
-          disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-        />
-      </PopoverContent>
-    </Popover>
-  )
-}
-
-export default function QuickRoutesPage() {
-  const [from, setFrom] = useState<string>('')
-  const [to, setTo] = useState<string>('')
-  const [date, setDate] = useState<Date | undefined>()
-  const [filterOption, setFilterOption] = useState<string>("none")
+const QuickRoutesPage = () => {
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
+  const [date, setDate] = useState<Date>()
+  const [filterOption, setFilterOption] = useState("none")
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    // Implement search functionality here
     console.log('Searching for routes:', { from, to, date })
+    // Implement search functionality here
   }
 
-  const getModeIcon = (mode: string) => {
-    switch (mode) {
-      case 'bus': return <Bus className="h-6 w-6" />
-      case 'train': return <Train className="h-6 w-6" />
-      case 'flight': return <Plane className="h-6 w-6" />
-      case 'car': return <Car className="h-6 w-6" />
-      default: return null
+  const getModeIcon = (mode: 'bus' | 'train' | 'flight' | 'car') => {
+    const icons: { [key in 'bus' | 'train' | 'flight' | 'car']: JSX.Element } = {
+      bus: <Bus className="h-6 w-6" />,
+      train: <Train className="h-6 w-6" />,
+      flight: <Plane className="h-6 w-6" />,
+      car: <Car className="h-6 w-6" />,
     }
+    return icons[mode] || null
   }
 
   const formatTime = (minutes: number) => {
@@ -87,19 +83,13 @@ export default function QuickRoutesPage() {
   }
 
   const filteredRoutes = useMemo(() => {
-    let sortedRoutes = [...routes]
-    switch (filterOption) {
-      case "time":
-        sortedRoutes.sort((a, b) => a.time - b.time)
-        break
-      case "money":
-        sortedRoutes.sort((a, b) => a.price - b.price)
-        break
-      case "both":
-        sortedRoutes.sort((a, b) => (a.time * a.price) - (b.time * b.price))
-        break
-      default:
-        break
+    const sortedRoutes = [...routes]
+    if (filterOption === "time") {
+      sortedRoutes.sort((a, b) => a.time - b.time)
+    } else if (filterOption === "money") {
+      sortedRoutes.sort((a, b) => a.price - b.price)
+    } else if (filterOption === "both") {
+      sortedRoutes.sort((a, b) => (a.time * a.price) - (b.time * b.price))
     }
     return sortedRoutes
   }, [filterOption])
@@ -108,8 +98,8 @@ export default function QuickRoutesPage() {
     <div className="min-h-screen bg-gray-900 text-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-center mb-8 text-blue-400">Quick Routes</h1>
-
-        {/* Search Card */}
+        
+        {/* Search Routes Card */}
         <Card className="bg-gray-800 border-blue-700 mb-8">
           <CardHeader>
             <CardTitle className="text-2xl text-blue-400">Search Routes</CardTitle>
@@ -117,9 +107,8 @@ export default function QuickRoutesPage() {
           <CardContent>
             <form onSubmit={handleSearch} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* From Input */}
                 <div className="space-y-2">
-                  <label htmlFor="from" className="block text-sm font-medium text-gray-300">From</label>
+                  <Label htmlFor="from" className="block text-sm font-medium text-gray-300">From</Label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                     <Input
@@ -132,9 +121,8 @@ export default function QuickRoutesPage() {
                     />
                   </div>
                 </div>
-                {/* To Input */}
                 <div className="space-y-2">
-                  <label htmlFor="to" className="block text-sm font-medium text-gray-300">To</label>
+                  <Label htmlFor="to" className="block text-sm font-medium text-gray-300">To</Label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                     <Input
@@ -147,13 +135,11 @@ export default function QuickRoutesPage() {
                     />
                   </div>
                 </div>
-                {/* Date Picker */}
                 <div className="space-y-2">
-                  <label htmlFor="date" className="block text-sm font-medium text-gray-300">Date</label>
+                  <Label htmlFor="date" className="block text-sm font-medium text-gray-300">Date</Label>
                   <DatePicker date={date} setDate={setDate} />
                 </div>
               </div>
-              {/* Search Button */}
               <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                 <Search className="mr-2 h-4 w-4" />
                 Search Routes
@@ -162,7 +148,6 @@ export default function QuickRoutesPage() {
           </CardContent>
         </Card>
 
-        {/* Routes and Tips Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             {/* Quickest Routes Card */}
@@ -175,12 +160,22 @@ export default function QuickRoutesPage() {
                   <h3 className="text-lg font-semibold mb-2">Filter by:</h3>
                   <RadioGroup defaultValue="none" onValueChange={setFilterOption}>
                     <div className="flex space-x-4">
-                      {["none", "time", "money", "both"].map((option) => (
-                        <div key={option} className="flex items-center space-x-2">
-                          <RadioGroupItem value={option} id={option} />
-                          <Label htmlFor={option}>{option.charAt(0).toUpperCase() + option.slice(1)}</Label>
-                        </div>
-                      ))}
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="none" id="none" />
+                        <Label htmlFor="none">None</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="time" id="time" />
+                        <Label htmlFor="time">Time</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="money" id="money" />
+                        <Label htmlFor="money">Money</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="both" id="both" />
+                        <Label htmlFor="both">Time & Money</Label>
+                      </div>
                     </div>
                   </RadioGroup>
                 </div>
@@ -191,42 +186,41 @@ export default function QuickRoutesPage() {
                         {getModeIcon(route.mode)}
                         <div>
                           <p className="font-semibold">{route.mode.charAt(0).toUpperCase() + route.mode.slice(1)}</p>
-                          <p className="text-sm text-gray-400">{route.distance} - {formatTime(route.time)}</p>
+                          <p className="text-sm text-gray-400">{route.distance}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">${route.price}</p>
-                        <p className="text-sm text-gray-400">{route.eco && <Leaf className="inline h-4 w-4" />} Eco-friendly</p>
+                        <p className="font-semibold">{formatTime(route.time)}</p>
+                        <p className="text-sm text-gray-400">${route.price}</p>
                       </div>
+                      <Button variant="outline" className="ml-4">
+                        Book
+                      </Button>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
           </div>
+          <div>
+            <Card className="bg-gray-800 border-blue-700">
+              <CardHeader>
+                <CardTitle className="text-2xl text-blue-400">Map View</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="aspect-square bg-gray-700 rounded-lg flex items-center justify-center">
+                  <p className="text-gray-400">Interactive map will be displayed here</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* Travel Tips Card */}
-          <Card className="bg-gray-800 border-blue-700">
-            <CardHeader>
-              <CardTitle className="text-2xl text-blue-400">Travel Tips</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc list-inside space-y-2">
-                {tips.map((tip, index) => (
-                  <li key={index}>{tip}</li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Map View Section */}
-        <div className="mt-12 bg-gray-800 border-blue-700 p-8 rounded-lg">
-          <h2 className="text-2xl text-blue-400 mb-4">Interactive Map</h2>
-          <p>Map view for your search will be available here.</p>
-          {/* Integrate your map view here, using a library like react-leaflet or Google Maps API */}
+          
+          
         </div>
       </div>
     </div>
   )
 }
+
+export default QuickRoutesPage
