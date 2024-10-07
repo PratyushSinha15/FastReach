@@ -61,19 +61,33 @@ router.post('/signin', async (req, res) => {
     try {
         const validatedData = signInSchema.parse(req.body);
 
-        const user = await User.findOne({ email: validatedData.email });
+        const user = await User.findOne({
+             email: validatedData.email 
+        });
         if (!user) {
-            return res.status(400).json({ message: 'Invalid email or password' });
+            return res.status(400).json(
+                { 
+                    message: 'Invalid email or password' 
+                }
+            );
         }
 
         const isMatch = await bcrypt.compare(validatedData.password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid email or password' });
+            return res.status(400).json(
+                {
+                     message: 'Invalid email or password' 
+                }
+            );
         }
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ 
+            id: user._id 
+        }, 
+        process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
         res.status(200).json({ token, message: 'User logged in successfully' });
+        
     } catch (error) {
         if (error instanceof z.ZodError) {
             res.status(400).json({ message: error.errors });

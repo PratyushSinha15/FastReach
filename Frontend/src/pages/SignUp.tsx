@@ -80,68 +80,66 @@ function SignUp() {
     };
 
     return (
-        <div className="flex maindiv justify-center items-center h-screen w-screen">
-            <div className="flex flex-nowrap justify-around w-full h-fit p-4">
-                <div>
-                    <Welcome />
-                </div>
-                <div className="font-sans flex flex-col text-white justify-center items-center border rounded-lg p-8 h-fit">
-                    <h1 className="text-3xl font-bold mb-4">Sign Up</h1>
-                    {error && <p className="error text-red-500">{error}</p>}
-                    <form className="flex flex-col">
+        <div className=" maindiv grid grid-cols-1 lg:grid-cols-2 h-screen">
+            <div className="flex justify-center">
+                <Welcome />
+            </div>
+            <div className="font-sans border-l flex text-white flex-col justify-center items-center">
+                {error && <p className="error text-red-500 text-sm mt-1 mb-1">{error}</p>}
+                <form className="flex border box-border p-10 rounded-3xl border-l-violet-950   flex-col">
+                <h1 className="text-4xl text-center font-bold">Sign Up</h1>
+                    <input
+                        type="text"
+                        placeholder="Name"
+                        value={name}
+                        className="text-black mb-2 mt-2 h-8 w-[300px] text-lg rounded-xl pl-2"
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                    />
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        className="text-black mb-2 mt-2 h-8 w-[300px] text-lg rounded-xl pl-2"
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        className="text-black mb-2 mt-2 h-8 w-[300px] text-lg rounded-xl pl-2"
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                    />
+                    <input
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        className="text-black mb-2 mt-2 h-8 w-[300px] text-lg rounded-xl pl-2"
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+                    />
+                    <div className="flex space-x-4 mb-4">
                         <input
-                            type="text"
-                            placeholder="Name"
-                            value={name}
-                            className="text-black mb-4 h-8 w-[300px] text-lg rounded-lg border border-gray-400 pl-2"
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                            type="number"
+                            placeholder="Age"
+                            value={age}
+                            className="text-black h-8 w-[100px] text-lg rounded-xl pl-2"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => setAge(e.target.value)}
                         />
-                        <input
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            className="text-black mb-4 h-8 w-[300px] text-lg rounded-lg border border-gray-400 pl-2"
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                        />
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            className="text-black mb-4 h-8 w-[300px] text-lg rounded-lg border border-gray-400 pl-2"
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                        />
-                        <input
-                            type="password"
-                            placeholder="Confirm Password"
-                            value={confirmPassword}
-                            className="text-black mb-4 h-8 w-[300px] text-lg rounded-lg border border-gray-400 pl-2"
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
-                        />
-                        <div className="flex space-x-4 mb-4">
-                            <input
-                                type="number"
-                                placeholder="Age"
-                                value={age}
-                                className="text-black h-8 w-[100px] text-lg rounded-lg border border-gray-400 pl-2"
-                                onChange={(e: ChangeEvent<HTMLInputElement>) => setAge(e.target.value)}
-                            />
-                            <select
-                                value={gender}
-                                className="text-black h-8 w-[150px] text-lg rounded-lg border border-gray-400 pl-2"
-                                onChange={(e: ChangeEvent<HTMLSelectElement>) => setGender(e.target.value)}
-                            >
-                                <option value="" disabled>Select Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div className="flex justify-center mb-4">
-                            <Button label="Sign Up" onClick={handleSignUp} />
-                        </div>
-                        <BottomWarning label="Already have an account?" buttonText="Sign In" to="/signin" />
-                    </form>
-                </div>
+                        <select
+                            value={gender}
+                            className="text-black h-8 w-[150px] text-lg rounded-xl pl-2"
+                            onChange={(e: ChangeEvent<HTMLSelectElement>) => setGender(e.target.value)}
+                        >
+                            <option value="" disabled>Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Chakka</option>
+                        </select>
+                    </div>
+                    <div className="flex justify-center mb-4">
+                        <Button label="Sign Up" onClick={handleSignUp} />
+                    </div>
+                    <BottomWarning label="Already have an account?" buttonText="Sign In" to="/signin" />
+                </form>
             </div>
         </div>
     );

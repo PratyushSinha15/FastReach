@@ -2,3 +2,9 @@
     background: rgb(2,0,36);
 background: linear-gradient(90deg, rgb(7, 0, 26) 5%, rgb(0, 0, 68) 100%);    
 }
+
+/* h1 {
+    background: -webkit-linear-gradient(#ffffff, #2f00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  } */
