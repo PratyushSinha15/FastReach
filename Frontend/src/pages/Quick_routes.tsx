@@ -20,12 +20,12 @@ const routes: { id: number, mode: TransportMode, time: number, distance: string,
   { id: 4, mode: 'car', time: 120, distance: '200 km', price: 30, eco: false },
 ]
 
-const tips = [
-  "Travel during off-peak hours to save on costs.",
-  "Consider carpooling or public transport for a more eco-friendly journey.",
-  "Book in advance to secure better prices on tickets.",
-  "Pack light to avoid excess baggage fees on flights.",
-]
+// const tips = [
+//   "Travel during off-peak hours to save on costs.",
+//   "Consider carpooling or public transport for a more eco-friendly journey.",
+//   "Book in advance to secure better prices on tickets.",
+//   "Pack light to avoid excess baggage fees on flights.",
+// ]
 
 // Date Picker Component
 const DatePicker = ({ date, setDate }: { date: Date | undefined, setDate: (date: Date | undefined) => void }) => (

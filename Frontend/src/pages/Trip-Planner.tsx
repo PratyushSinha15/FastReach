@@ -1,37 +1,44 @@
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { MapPin, Navigation, Loader2 } from 'lucide-react'
-
-type TripPlan = {
-  steps: string[];
-} | null;
+import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MapPin, Navigation, Loader2 } from 'lucide-react';
 
 export default function TripPlanner() {
   const [currentLocation, setCurrentLocation] = useState<string>('');
   const [destination, setDestination] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [tripPlan, setTripPlan] = useState<TripPlan>(null);
+  const [tripPlan, setTripPlan] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(null);
 
-    // Simulate API call to generate trip plan
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setTripPlan({
-      steps: [
-        "Start from your current location",
-        "Head north on Main St",
-        "Turn right onto Broadway",
-        "Continue for 2 miles",
-        "Arrive at your destination"
-      ]
-    });
-    
-    setIsLoading(false);
+    try {
+      const response = await fetch('http://localhost:5000/api/trips/generate-trip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          startingLocation: currentLocation,
+          destination,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate trip plan');
+      }
+
+      const data = await response.json();
+      setTripPlan(data.tripPlan); // Set the trip plan directly as a string
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -98,19 +105,15 @@ export default function TripPlanner() {
           </CardContent>
         </Card>
 
+        {errorMessage && (
+          <div className="mt-4 text-red-500 text-center">{errorMessage}</div>
+        )}
+
         {tripPlan && (
-          <Card className="mt-8 bg-gray-800 border-blue-700">
-            <CardHeader>
-              <CardTitle className="text-2xl text-blue-400">Your Trip Plan</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ol className="list-decimal list-inside space-y-2">
-                {tripPlan.steps.map((step, index) => (
-                  <li key={index} className="text-gray-300">{step}</li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
+          <div className="mt-8 bg-gray-800 border-blue-700 p-4 rounded">
+            <h2 className="text-2xl text-blue-400 mb-2">Your Trip Plan</h2>
+            <p className="text-gray-300">{tripPlan}</p> {/* Displaying trip plan as simple text */}
+          </div>
         )}
       </div>
     </div>
