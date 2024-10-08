@@ -5,7 +5,8 @@ import Signin from './pages/Signin';
 import Signup from './pages/SignUp';
 import Home from './pages/Home';
 import TripPlanner from './pages/Trip-Planner';
-import QuickRoutesPage from './pages/Quick_routes';
+
+import RouteSearch from './pages/RouteSearch';
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home/>} />
           <Route path="/trip-planner" element={<TripPlanner/>} />
-          <Route path="/quick-routes" element={<QuickRoutesPage/>} />
+          <Route path="/quick-routes" element={<RouteSearch/>} />
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
         </Routes>
